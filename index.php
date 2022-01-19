@@ -20,10 +20,18 @@ DB::config([
 
 //dumpl("PDO", DB::pdo());
 
+// WHERE
+$user = new User;
+$result = $user->where("{{id}} = :id AND {{email}} = :email", [
+    ":id" => 2,
+    ":email" => "johann@mail.com"
+]);
+dumpl("WHERE", $result);
+
 // FIND ID
 $user = new User;
 $result = $user->findId(1);
-dumpl("FIND", $result);
+dumpl("FIND ID", $result);
 
 if ($result === null) {
     // INSERT
@@ -31,7 +39,12 @@ if ($result === null) {
     $user->name = "Matheus";
     $user->email = "matheus@mail.com";
     $user->age = 23;
-    dumpl($user->save());
+    dumpl("INSERT", $user->save());
+
+    $user = new User;
+    $user->name = "Johann";
+    $user->email = "johann@mail.com";
+    $user->age = 23;
     dumpl("INSERT", $user->save());
 } else {
     // UPDATE
@@ -52,8 +65,7 @@ if ($result === null) {
 $user = new User;
 $result = $user->all();
 dumpl("ALL", $result);
-
-if (count($result) > 2) {
+if (count($result) > 3) {
     // TRUNCATE
     $user = new User;    
     dumpl("TRUNCATE", $user->truncate(true));

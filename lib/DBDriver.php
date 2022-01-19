@@ -1,5 +1,12 @@
 <?php
 
+/*
+	GitHub: https://github.com/matheusjohannaraujo/makemvcss
+	Country: Brasil
+	State: Pernambuco
+	Developer: Matheus Johann Araujo
+*/
+
 namespace Lib;
 
 use PDO;

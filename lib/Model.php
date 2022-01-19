@@ -1,5 +1,12 @@
 <?php
 
+/*
+	GitHub: https://github.com/matheusjohannaraujo/makemvcss
+	Country: Brasil
+	State: Pernambuco
+	Developer: Matheus Johann Araujo
+*/
+
 namespace Lib;
 
 use Lib\DB;
@@ -7,17 +14,20 @@ use Lib\DB;
 class Model
 {
 
-    public $PREFIX = "";
-    public $POSFIX = "";
     public $id = "INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT";
     public $created_at = "DATETIME NOT NULL";
     public $updated_at = "DATETIME NULL";
+    public $PRE_FIX_TB = "tb_";
+    public $POS_FIX_TB = "s";
+    public $PRE_FIX_COL = "";
+    public $POS_FIX_COL = "";
+    private $VAR_DEFS = null;
 
     public function __construct()
     {
-        $var_defs = $this->keys_values("{{", "}}");
+        $this->VAR_DEFS = $this->keys_values("{{", "}}");
         $this->reset();
-        $this->create($var_defs);
+        $this->create($this->VAR_DEFS);
     }
     
     public function set($name, $value)
@@ -92,11 +102,11 @@ class Model
 
     private function parseTupleToInstance(&$inst, &$tuple)
     {
-        $sizePrefix = strlen($this->PREFIX);
-        $sizePosfix = strlen($this->POSFIX);
+        $sizePRE_FIX_COL = strlen($this->PRE_FIX_COL);
+        $sizePOS_FIX_COL = strlen($this->POS_FIX_COL);
         foreach ($tuple as $key => $value) {
-            $key = substr($key, $sizePrefix);
-            $key = substr($key, 0, strlen($key) - $sizePosfix);
+            $key = substr($key, $sizePRE_FIX_COL);
+            $key = substr($key, 0, strlen($key) - $sizePOS_FIX_COL);
             $inst->set($key, $value);
         }
         return $inst;
@@ -105,7 +115,7 @@ class Model
     private function query_params($query_params)
     {
         $keys = $this->keys("{{", "}}");
-        $keys_tb = $this->keys($this->PREFIX, $this->POSFIX);
+        $keys_tb = $this->keys($this->PRE_FIX_COL, $this->POS_FIX_COL);
         foreach ($keys as $index => $key) {
             $query_params = str_replace([$key, strtoupper($key)], $keys_tb[$index], $query_params);
         }
@@ -114,7 +124,7 @@ class Model
 
     public function tb_name()
     {
-        return decamelize("tb" . $this->class_name()) . "s";
+        return $this->PRE_FIX_TB . decamelize($this->class_name()) . $this->POS_FIX_TB;
     }
 
     public function describe()
@@ -134,7 +144,7 @@ class Model
 
     public function diff_col_names(){
         $tb_describe = $this->describe();
-        $tb_colums = $this->keys($this->PREFIX, $this->POSFIX);
+        $tb_colums = $this->keys($this->PRE_FIX_COL, $this->POS_FIX_COL);
         if (count($tb_describe) != count($tb_colums)) {
             return true;
         } else {
@@ -175,7 +185,7 @@ class Model
             $sql = "CREATE TABLE IF NOT EXISTS $tb_name (" . implode(", ", $keys) . ") ENGINE=$DB_ENGINE CHARSET=$DB_CHARSET COLLATE $DB_CHARSET_COLLATE";
             $sql = $this->query_params($sql);
             DB::query($sql);
-            dumpd("A new table called `$tb_name` was created", $sql);
+            dumpl("A new table called `$tb_name` was created", $sql);
             return true;
         }
         return false;
@@ -196,7 +206,7 @@ class Model
         if (!$force) {
             return DB::truncate_table($this->tb_name());
         }
-        return [$this->drop(), $this->create()];
+        return [$this->drop(), $this->create($this->VAR_DEFS)];
     }
 
     public function table_order_id()
@@ -214,7 +224,7 @@ class Model
     {
         $keys_values = $this->keys_values(":");
         if ($this->findId(null, false) === null) {
-            $keys = implode(", ", $this->keys($this->PREFIX, $this->POSFIX));
+            $keys = implode(", ", $this->keys($this->PRE_FIX_COL, $this->POS_FIX_COL));
             $values = implode(", ", $this->keys(":"));
             $keys_values[":created_at"] = date("Y-m-d H:i:s");
             $this->created_at = $keys_values[":created_at"];
@@ -252,7 +262,7 @@ class Model
         $sql = "SELECT * FROM " . $this->tb_name();
         if ($where !== null) {
             $keys = $this->keys("{{", "}}");
-            $keys_tb = $this->keys($this->PREFIX, $this->POSFIX);
+            $keys_tb = $this->keys($this->PRE_FIX_COL, $this->POS_FIX_COL);
             foreach ($keys as $index => $key) {
                 $where = str_replace($key, $keys_tb[$index], $where);
             }            
@@ -272,18 +282,19 @@ class Model
         return [];
     }
 
-    public function find($where = null, $where_values = [])
+    public function where($where = null, $where_values = [])
     {
-        $result = $this->all($where . " LIMIT 1", $where_values);
-        return count($result) == 1 ? $result[0] : null;
+        $result = $this->all($where, $where_values);
+        return count($result) > 0 ? $result : null;
     }
 
-    public function findId($id = null, $inject = true)
+    public function findId($id = null)
     {
         if ($id === null) {
             $id = $this->id;
         }
-        return $this->find("{{id}} = :id", [":id" => $id]);
+        $result = $this->where("{{id}} = :id LIMIT 1", [":id" => $id]);
+        return ($result !== null && count($result)) == 1 ? $result[0] : null;
     }
     
     public function delete($id = null)

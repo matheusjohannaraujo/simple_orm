@@ -1,5 +1,12 @@
 <?php
 
+/*
+	GitHub: https://github.com/matheusjohannaraujo/makemvcss
+	Country: Brasil
+	State: Pernambuco
+	Developer: Matheus Johann Araujo
+*/
+
 namespace Lib;
 
 use PDO;
@@ -151,7 +158,7 @@ class DB
         return self::query("DROP TABLE $tb_name");
     }
 
-    public function truncate_table($tb_name)
+    public static function truncate_table($tb_name)
     {
         return self::query("TRUNCATE $tb_name");
     }
