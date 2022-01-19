@@ -1,0 +1,21 @@
+{
+    "require": {
+      "php": ">=7.2.5"
+    },
+    "autoload": {
+      "psr-4": {
+        "Lib\\": "lib/",
+        "lib\\": "lib/",
+        "Models\\": "models/",
+        "models\\": "models/"
+      },
+      "files": [
+        "lib/functions.php"
+      ]
+    },
+    "scripts": {
+      "update-ignore": "composer update --ignore-platform-reqs",
+      "ext-require": "composer require --ignore-platform-reqs ext-curl:* ext-fileinfo:* ext-intl:* ext-gd:* ext-openssl:* ext-ftp:* ext-pdo_sqlite:* ext-pdo_mysql:* ext-pdo_pgsql:*",
+      "ext-remove": "composer remove ext-curl ext-fileinfo ext-intl ext-gd ext-openssl ext-ftp ext-pdo_sqlite ext-pdo_mysql ext-pdo_pgsql"
+    }
+  }
