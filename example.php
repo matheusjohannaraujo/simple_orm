@@ -2,23 +2,12 @@
 
 require_once "vendor/autoload.php";
 
-use \Lib\DB;
-use \Models\User;
+use Lib\DB;
+use Lib\ENV;
+use Models\User;
 
-DB::config([
-    "DB_RUN_CREATE" => true,
-    "DB_CONNECTION" => "mysql",
-    "DB_HOST" => "localhost",
-    "DB_PORT" => 3306,
-    "DB_ENGINE" => "MyISAM",
-    "DB_CHARSET" => "utf8",
-    "DB_CHARSET_COLLATE" => "utf8_unicode_ci",
-    "DB_USERNAME" => "root",
-    "DB_PASSWORD" => "",
-    "DB_DATABASE" => "mydatabase"
-]);
-
-//dumpl("PDO", DB::pdo());
+DB::config((new ENV)->read());
+dumpl("PDO", DB::pdo());
 
 // WHERE
 $user = new User;
