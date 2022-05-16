@@ -1,7 +1,7 @@
 
 # [Simple ORM](https://github.com/matheusjohannaraujo/simple_orm)
 
-### [Guia completo de uso no YouTube](https://www.youtube.com/watch?v=s5aICyenKXE)
+### [Guia completo de uso no YouTube](https://www.youtube.com/watch?v=VjPdXEuH7Lo)
 
 ```php
 const DEVELOPER_INFO = [
